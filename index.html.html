@@ -1,0 +1,915 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Universal Sound Foundation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #faf8f3;
+    --bg-raised: #f2efe6;
+    --ink: #1b211f;
+    --ink-soft: #4a534f;
+    --ink-faint: #7d857f;
+    --line: #d8d2c4;
+    --accent: #2c4c4c;
+    --accent-soft: #3f6663;
+    --accent-tint: #e2e9e7;
+    --gold: #a97327;
+    --gold-tint: #f2e5cf;
+    --needed-bg: #fbf1e0;
+    --needed-border: #cf9a3f;
+    --needed-text: #7a5417;
+    --shadow: 0 1px 2px rgba(27,33,31,0.04), 0 8px 24px -12px rgba(27,33,31,0.12);
+    --radius: 3px;
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg: #121613;
+      --bg-raised: #191f1b;
+      --ink: #ece8dd;
+      --ink-soft: #b7bdb5;
+      --ink-faint: #7f8781;
+      --line: #2b322d;
+      --accent: #7fada7;
+      --accent-soft: #9fc4bf;
+      --accent-tint: #1c2724;
+      --gold: #d9a24f;
+      --gold-tint: #2a2115;
+      --needed-bg: #241d10;
+      --needed-border: #a8802f;
+      --needed-text: #e3bd7c;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg: #121613;
+    --bg-raised: #191f1b;
+    --ink: #ece8dd;
+    --ink-soft: #b7bdb5;
+    --ink-faint: #7f8781;
+    --line: #2b322d;
+    --accent: #7fada7;
+    --accent-soft: #9fc4bf;
+    --accent-tint: #1c2724;
+    --gold: #d9a24f;
+    --gold-tint: #2a2115;
+    --needed-bg: #241d10;
+    --needed-border: #a8802f;
+    --needed-text: #e3bd7c;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;} }
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  h1,h2,h3,h4{
+    font-family:'Newsreader', ui-serif, Georgia, serif;
+    font-weight:500;
+    color:var(--ink);
+    margin:0;
+    text-wrap:balance;
+  }
+
+  a{color:inherit;}
+
+  .wrap{
+    max-width:1120px;
+    margin:0 auto;
+    padding:0 32px;
+  }
+
+  .eyebrow{
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    font-size:12.5px;
+    letter-spacing:0.11em;
+    text-transform:uppercase;
+    color:var(--accent-soft);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:22px;
+    height:1px;
+    background:var(--accent-soft);
+    display:inline-block;
+  }
+
+  .needed{
+    display:inline-flex;
+    align-items:baseline;
+    gap:6px;
+    background:var(--needed-bg);
+    border:1px dashed var(--needed-border);
+    color:var(--needed-text);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:0.02em;
+    padding:5px 10px;
+    border-radius:var(--radius);
+    line-height:1.5;
+  }
+  .needed::before{ content:"◐"; font-size:11px; }
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 32px;
+    max-width:1120px;
+    margin:0 auto;
+    gap:24px;
+  }
+  .brand{
+    font-family:'Newsreader', serif;
+    font-size:19px;
+    font-weight:500;
+    letter-spacing:0.01em;
+    white-space:nowrap;
+  }
+  .brand span{ color: var(--accent-soft); }
+  nav.links{
+    display:flex;
+    gap:30px;
+    font-size:14.5px;
+    color:var(--ink-soft);
+  }
+  nav.links a{ text-decoration:none; }
+  nav.links a:hover{ color:var(--ink); }
+  .btn{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:14.5px;
+    font-weight:500;
+    border:none;
+    cursor:pointer;
+    padding:11px 22px;
+    border-radius:2px;
+    text-decoration:none;
+    display:inline-block;
+    transition:transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  }
+  .btn-primary{
+    background:var(--gold);
+    color:#1b1204;
+  }
+  .btn-primary:hover{ transform:translateY(-1px); box-shadow:var(--shadow); }
+  .btn-ghost{
+    background:transparent;
+    color:var(--ink);
+    border:1px solid var(--line);
+  }
+  .btn-ghost:hover{ border-color:var(--ink-faint); }
+  .header-cta{ flex-shrink:0; }
+  @media (max-width:820px){
+    nav.links{ display:none; }
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding:76px 0 64px;
+    border-bottom:1px solid var(--line);
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns:1.15fr 0.85fr;
+    gap:56px;
+    align-items:center;
+  }
+  @media (max-width:900px){ .hero-grid{ grid-template-columns:1fr; gap:40px; } }
+
+  .hero h1{
+    font-size:clamp(2.5rem, 4.6vw, 4rem);
+    line-height:1.04;
+    margin-top:18px;
+  }
+  .hero .sub{
+    font-family:'Newsreader', serif;
+    font-style:italic;
+    font-size:1.35rem;
+    color:var(--accent-soft);
+    margin-top:18px;
+  }
+  .hero p.lede{
+    margin-top:22px;
+    max-width:52ch;
+    color:var(--ink-soft);
+    font-size:1.05rem;
+  }
+  .hero p.lede strong{ color:var(--ink); font-weight:600; }
+  .cta-row{
+    margin-top:32px;
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .link-arrow{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    text-decoration:none;
+    border-bottom:1px solid var(--line);
+    padding-bottom:2px;
+  }
+  .link-arrow:hover{ color:var(--ink); border-color:var(--ink-faint); }
+
+  .wave-panel{
+    border:1px solid var(--line);
+    background:var(--bg-raised);
+    border-radius:4px;
+    padding:22px 22px 18px;
+  }
+  canvas#wavecanvas{ width:100%; height:180px; display:block; }
+  .wave-caption{
+    display:flex;
+    justify-content:space-between;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:var(--ink-faint);
+    letter-spacing:0.04em;
+    margin-top:10px;
+    text-transform:uppercase;
+  }
+
+  /* ---------- Section scaffolding ---------- */
+  section{ padding:80px 0; border-bottom:1px solid var(--line); }
+  section.tight{ padding:64px 0; }
+  .section-head{ max-width:640px; }
+  .section-head h2{ font-size:clamp(1.7rem,2.6vw,2.3rem); margin-top:14px; }
+  .section-head p{ color:var(--ink-soft); margin-top:16px; font-size:1.02rem; max-width:58ch; }
+
+  blockquote.pull{
+    font-family:'Newsreader', serif;
+    font-style:italic;
+    font-size:1.5rem;
+    line-height:1.5;
+    color:var(--ink);
+    border-left:2px solid var(--accent);
+    padding-left:26px;
+    margin:36px 0 0;
+    max-width:62ch;
+  }
+  blockquote.pull cite{ display:block; font-style:normal; font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-faint); margin-top:14px; letter-spacing:0.04em; }
+
+  .stat-row{
+    display:flex;
+    gap:48px;
+    margin-top:44px;
+    flex-wrap:wrap;
+  }
+  .stat{ font-family:'IBM Plex Mono', monospace; }
+  .stat .num{ font-size:2.4rem; color:var(--accent); font-weight:500; }
+  .stat .label{ font-size:12.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.07em; margin-top:4px; }
+
+  /* ---------- Research steps ---------- */
+  .steps{
+    margin-top:52px;
+    display:flex;
+    flex-direction:column;
+  }
+  .step{
+    display:grid;
+    grid-template-columns:70px 1fr;
+    gap:28px;
+    padding:34px 0;
+    border-top:1px solid var(--line);
+  }
+  .step:last-child{ padding-bottom:0; }
+  .step .idx{
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--ink-faint);
+    font-size:13px;
+    padding-top:4px;
+  }
+  .step h3{ font-size:1.28rem; font-weight:500; }
+  .step p{ color:var(--ink-soft); margin-top:10px; max-width:64ch; }
+  .step .tag{
+    display:inline-block;
+    margin-top:14px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--accent-soft);
+    background:var(--accent-tint);
+    padding:4px 9px;
+    border-radius:2px;
+  }
+
+  details.protocol{
+    margin-top:26px;
+    border:1px solid var(--line);
+    border-radius:4px;
+    background:var(--bg-raised);
+  }
+  details.protocol summary{
+    cursor:pointer;
+    padding:16px 20px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    letter-spacing:0.03em;
+    color:var(--accent-soft);
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  details.protocol summary::-webkit-details-marker{ display:none; }
+  details.protocol summary::after{ content:"+"; font-size:18px; color:var(--ink-faint); }
+  details.protocol[open] summary::after{ content:"–"; }
+  .protocol-body{
+    padding:0 20px 24px;
+    font-size:14.5px;
+    color:var(--ink-soft);
+  }
+  .protocol-body dl{ display:grid; grid-template-columns:120px 1fr; gap:8px 16px; margin:0 0 16px; font-family:'IBM Plex Mono', monospace; font-size:13px; }
+  .protocol-body dt{ color:var(--ink-faint); }
+  .protocol-body dd{ margin:0; color:var(--ink); }
+  .protocol-body p{ margin-top:0; }
+
+  /* ---------- Funding ---------- */
+  .fund-panel{
+    margin-top:48px;
+    background:var(--bg-raised);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:44px 44px 40px;
+  }
+  @media (max-width:640px){ .fund-panel{ padding:32px 24px; } }
+  .fund-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    flex-wrap:wrap;
+    gap:16px;
+  }
+  .fund-goal{ font-family:'IBM Plex Mono', monospace; }
+  .fund-goal .amount{ font-size:2.8rem; color:var(--ink); font-weight:500; }
+  .fund-goal .amount small{ font-size:1.1rem; color:var(--ink-faint); font-weight:400; }
+  .fund-goal .of{ font-size:13px; color:var(--ink-faint); margin-top:4px; }
+  .bar-track{
+    margin-top:22px;
+    height:10px;
+    background:var(--line);
+    border-radius:6px;
+    overflow:hidden;
+  }
+  .bar-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg, var(--accent), var(--gold));
+    border-radius:6px;
+  }
+  .bar-labels{ display:flex; justify-content:space-between; margin-top:8px; font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-faint); }
+  .fund-cta{ margin-top:30px; display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+  .fund-note{ margin-top:26px; font-size:13.5px; color:var(--ink-faint); border-top:1px solid var(--line); padding-top:20px; }
+
+  .allocation{ margin-top:28px; display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  @media (max-width:700px){ .allocation{ grid-template-columns:1fr; } }
+  .allocation .cell{ border:1px dashed var(--needed-border); background:var(--needed-bg); border-radius:4px; padding:16px 18px; }
+  .allocation .cell .t{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--needed-text); }
+  .allocation .cell .d{ font-size:13.5px; color:var(--needed-text); margin-top:6px; opacity:0.85; }
+
+  /* ---------- Feedback quotes ---------- */
+  .quote-grid{
+    margin-top:48px;
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+  }
+  @media (max-width:820px){ .quote-grid{ grid-template-columns:1fr; } }
+  .quote-card{
+    background:var(--bg);
+    padding:28px 26px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .quote-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--gold);
+  }
+  .quote-text{
+    font-family:'Newsreader', serif;
+    font-size:1.05rem;
+    line-height:1.55;
+    color:var(--ink);
+  }
+  .quote-meta{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:var(--ink-faint);
+    margin-top:auto;
+    padding-top:6px;
+  }
+  .source-note{
+    margin-top:26px;
+    font-size:13.5px;
+    color:var(--ink-faint);
+    max-width:70ch;
+  }
+  .divider-line{
+    margin:56px 0 0;
+    border:none;
+    border-top:1px solid var(--line);
+  }
+  .pivot-box{
+    margin-top:44px;
+    border-left:2px solid var(--gold);
+    padding-left:28px;
+    max-width:66ch;
+  }
+  .pivot-box p{ color:var(--ink-soft); font-size:1.05rem; margin:0 0 16px; }
+  .pivot-box p:last-child{ margin-bottom:0; }
+  .pivot-box strong{ color:var(--ink); font-weight:600; }
+
+  /* ---------- Engage ---------- */
+  .engage-grid{
+    margin-top:48px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+  }
+  @media (max-width:820px){ .engage-grid{ grid-template-columns:1fr; } }
+  .engage-cell{
+    background:var(--bg);
+    padding:34px 30px;
+  }
+  .engage-cell h3{ font-size:1.15rem; font-weight:500; }
+  .engage-cell p{ color:var(--ink-soft); font-size:14.5px; margin-top:10px; }
+  .engage-cell .btn{ margin-top:20px; }
+  .signup-row{ margin-top:18px; display:flex; gap:8px; }
+  .signup-row input{
+    flex:1;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    background:var(--bg-raised);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:13.5px;
+    border-radius:2px;
+  }
+
+  /* ---------- Closing ---------- */
+  .closing{
+    text-align:left;
+    padding:96px 0;
+  }
+  .closing .wrap{ max-width:760px; }
+  .closing h2{ font-size:clamp(1.9rem,3.2vw,2.6rem); }
+  .closing .final-line{
+    font-family:'Newsreader', serif;
+    font-style:italic;
+    font-size:1.3rem;
+    color:var(--accent-soft);
+    margin-top:26px;
+  }
+  .closing .cta-row{ margin-top:36px; }
+
+  footer{ padding:56px 0 48px; }
+  .footer-grid{
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:32px;
+  }
+  .footer-brand{ font-family:'Newsreader', serif; font-size:18px; }
+  .footer-meta{ font-size:13px; color:var(--ink-faint); margin-top:10px; max-width:38ch; }
+  footer nav{ display:flex; gap:22px; font-size:13.5px; color:var(--ink-soft); }
+  .footer-bottom{
+    margin-top:40px;
+    padding-top:24px;
+    border-top:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:12px;
+    font-size:12.5px;
+    color:var(--ink-faint);
+  }
+
+  ::selection{ background:var(--gold-tint); color:var(--ink); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-row">
+    <div class="brand">Universal Sound <span>Foundation</span></div>
+    <nav class="links">
+      <a href="#why">Our Story</a>
+      <a href="#heard">What We've Heard</a>
+      <a href="#research">The Research</a>
+      <a href="#fund">Fund This Study</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="header-cta"><a class="btn btn-primary" href="#fund">Donate</a></div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Universal Sound Foundation · Non‑Profit</div>
+      <h1>Advancing Sound Medicine</h1>
+      <div class="sub">Sound heals. Science reveals.</div>
+      <p class="lede">USF is a non‑profit born from a decade of lived experience with sound — and from a conviction that what people consistently feel deserves to be understood, not just described. Our work is to bring that experience into rigorous scientific inquiry.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#why">Read Our Story</a>
+        <a class="link-arrow" href="#fund">Support the research ↓</a>
+      </div>
+    </div>
+    <div class="wave-panel">
+      <canvas id="wavecanvas" width="600" height="360" aria-hidden="true"></canvas>
+      <div class="wave-caption"><span>136.1 Hz</span><span>Live waveform, illustrative</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="why" class="tight">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Who We Are, and Why</div>
+      <h2>Sound, before it was science</h2>
+      <p>The Foundation's work began with the discovery of 136.1&nbsp;Hz at the heart of <em>Essence</em> and the ASE (Alchemic Sonic Environment) Method — an intentionally designed sound practice, long before it was a research question.</p>
+    </div>
+
+    <blockquote class="pull">
+      "To unite ancient knowledge and modern science by supporting research, education and applications of sound medicine — enhancing well‑being, fostering healing and unlocking human potential through sound."
+      <cite>Our Mission</cite>
+    </blockquote>
+
+    <div class="stat-row">
+      <div class="stat">
+        <div class="num">5,000+</div>
+        <div class="label">Participants who have shared experiences of transformation through ASE</div>
+      </div>
+      <div class="stat">
+        <div class="num">2015</div>
+        <div class="label">The year ASE experiences began, still ongoing today</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="tight">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">How We Work</div>
+      <h2>What we're seeking to explore</h2>
+      <p>Since 2015, ASE has been experienced live — in intimate workshops, public exhibitions, wellness gatherings, and private sessions — as an intentionally composed environment of resonant frequencies, harmonic sequences, and spatial sound. People keep describing the same handful of shifts: calm, presence, altered states of mind, physical sensation, emotional release.</p>
+      <p style="margin-top:16px;">What USF is now seeking to explore is simple to state and hard to answer: is there something measurable happening in the brain when this occurs — and can it be studied with the same rigor given to any other candidate for medicine?</p>
+    </div>
+  </div>
+</section>
+
+<section id="heard">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">What We've Heard</div>
+      <h2>A decade of the same threads, told by thousands of people</h2>
+      <p>Across more than 20 live sessions and events since 2015 — from early EEG-monitored sessions with neuroscientists at Mindmaze, to public exhibitions and industry gatherings — participants have left <strong>1,384 written reflections</strong>. A small, representative sample, shown here anonymized:</p>
+    </div>
+
+    <div class="quote-grid">
+      <div class="quote-card">
+        <div class="quote-tag">Calm</div>
+        <div class="quote-text">"Feeling a sense of calmness, peace, relaxation, less stress, mind not racing everywhere."</div>
+        <div class="quote-meta">Participant · MUSEXPO, 2023</div>
+      </div>
+      <div class="quote-card">
+        <div class="quote-tag">Physical Sensation</div>
+        <div class="quote-text">"Transported — the sound felt like a massage around the body, like it was passing through me."</div>
+        <div class="quote-meta">Technical specialist · Mindmaze EEG session, 2015</div>
+      </div>
+      <div class="quote-card">
+        <div class="quote-tag">Presence</div>
+        <div class="quote-text">"My mind, which is normally racing with thoughts, was calm and 'empty.' I felt present, even as the sense of time dissolved."</div>
+        <div class="quote-meta">Participant, 55, female · Essence session, 2024</div>
+      </div>
+      <div class="quote-card">
+        <div class="quote-tag">Mood &amp; Memory</div>
+        <div class="quote-text">"It's been ever present — it lifts my mood, brings back memory, and connects me to others."</div>
+        <div class="quote-meta">Participant, 42, female · Essence session, 2024</div>
+      </div>
+      <div class="quote-card">
+        <div class="quote-tag">Stress Response</div>
+        <div class="quote-text">"Stress and anxiety management."</div>
+        <div class="quote-meta">Participant · EMHIC, 2024</div>
+      </div>
+      <div class="quote-card">
+        <div class="quote-tag">Connection</div>
+        <div class="quote-text">"The soundscape made me feel I belonged in the space, and that I connected with the art."</div>
+        <div class="quote-meta">Participant · Sublime, 2025</div>
+      </div>
+    </div>
+    <p class="source-note">Compiled from USF's internal feedback records, 2015–2025. Quotes are lightly trimmed for length; attribution is limited to what participants shared about themselves. <span class="needed">Confirm before public use: whether any named professional testimonials from this record may be published with attribution</span></p>
+
+    <div class="pivot-box">
+      <p>Calm. Presence. Stress response. Memory. These are not the words of a marketing brief — they're what people, unprompted, keep saying for themselves. And they are also, not coincidentally, <strong>the exact territory the Lieber Institute study investigates: emotional regulation, stress response, and associative memory.</strong></p>
+      <p>But consistent subjective experience, however widespread, is not scientific evidence. That gap — between what people feel and what can be measured — is the reason USF exists in its current form: not to keep collecting stories, but to find out whether there's something real and repeatable underneath them.</p>
+    </div>
+  </div>
+</section>
+
+<section class="tight">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Our First Research Partner</div>
+      <h2>The Lieber Institute for Brain Development</h2>
+      <p>To take these patterns seriously, USF sought a research partner equipped to study the brain with genuine scientific rigor. The Lieber Institute for Brain Development (LIBD) is now that partner — and <em>Listening to the Brain</em> is the first study in what USF intends to be an ongoing research relationship.</p>
+    </div>
+  </div>
+</section>
+
+<section id="research">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">The Research</div>
+      <h2>Listening to the Brain</h2>
+      <p>The first study of the USF × LIBD partnership, translated here in plain terms.</p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="idx">01</div>
+        <div>
+          <h3>The problem</h3>
+          <p>Chronic stress, anxiety, depression, and substance use affect hundreds of millions of people worldwide. Existing treatments — medication, and newer approaches such as psychedelic‑assisted therapy — don't work for everyone, and can carry side effects, safety questions, or scalability limits.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="idx">02</div>
+        <div>
+          <h3>The insight</h3>
+          <p>The brain is fundamentally rhythmic: neurons communicate through oscillating electrical patterns, and disruptions in those rhythms are increasingly recognized as a feature of conditions like depression, anxiety, and PTSD. Sound is itself rhythmic and oscillatory, and connects directly to the limbic circuitry — including the hippocampus and prefrontal cortex — involved in emotion and memory.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="idx">03</div>
+        <div>
+          <h3>The question</h3>
+          <p>Can specific sonic frequencies and harmonic sequences be studied as a biological stimulus — not simply something that feels calming, but something that can be shown, with data, to modulate the neural systems behind emotional regulation and stress response?</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="idx">04</div>
+        <div>
+          <h3>The study</h3>
+          <p>The Lieber Institute for Brain Development is designing a controlled laboratory study that compares a therapeutic harmonic sequence against a control sound and against silence, while directly measuring brain activity and behavior — a first, foundational step toward establishing whether this effect is real, measurable, and repeatable.</p>
+          <span class="tag">Proof‑of‑concept · LI‑2859</span>
+
+          <details class="protocol">
+            <summary>Read the full study protocol</summary>
+            <div class="protocol-body">
+              <dl>
+                <dt>Species</dt><dd>Mouse</dd>
+                <dt>Strain</dt><dd>C57BL/6J</dd>
+                <dt>Subjects</dt><dd>8 (4 male, 4 female)</dd>
+                <dt>Age</dt><dd>8 weeks at purchase; 11 weeks at testing</dd>
+                <dt>Study date</dt><dd><span class="needed">TBD</span></dd>
+              </dl>
+              <p>Each mouse is implanted with depth electrodes in the prelimbic cortex and dorsal hippocampus (CA1) — regions responsible for processing the emotional content of sound and associative learning. Using a within‑subjects crossover design, every mouse is tested under all three conditions (therapeutic harmonic sequence, control sound, no sound) in pseudorandom order, across three‑hour sessions: one hour of habituation, one hour of stimulus, and one hour of post‑stimulus observation to detect any lasting effect.</p>
+              <p style="margin-bottom:0;">Researchers will measure local field potentials (LFPs) for changes in oscillation power and synchronization, alongside automated, machine‑learning‑based behavioral tracking of locomotor activity.</p>
+            </div>
+          </details>
+        </div>
+      </div>
+      <div class="step">
+        <div class="idx">05</div>
+        <div>
+          <h3>Why it matters</h3>
+          <p>This is a proof‑of‑concept study, not a finished treatment. By directly measuring how structured sound influences brain oscillations and behavior, it moves the conversation about sonic therapeutics from belief toward biology — the first step in giving sound the same rigorous scientific scrutiny already given to any drug or device.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="tight">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">The Road Ahead</div>
+      <h2>Bringing the ASE Method forward through science</h2>
+      <p>The Lieber Institute study is the first step, not the last. USF's longer‑term goal is to keep developing the ASE Method through research and data — study by study. These are possible future directions described in the research proposal, contingent on what this first study finds, not commitments or claims about outcomes.</p>
+    </div>
+    <div class="stat-row" style="margin-top:32px;">
+      <div class="stat" style="max-width:260px;">
+        <div class="label" style="font-size:14px; color:var(--ink-soft); text-transform:none; letter-spacing:0; line-height:1.5;">Identifying which frequencies and harmonic structures are most effective, and in which brain regions.</div>
+      </div>
+      <div class="stat" style="max-width:260px;">
+        <div class="label" style="font-size:14px; color:var(--ink-soft); text-transform:none; letter-spacing:0; line-height:1.5;">Developing non‑invasive markers (such as EEG) that could eventually inform early human research.</div>
+      </div>
+      <div class="stat" style="max-width:260px;">
+        <div class="label" style="font-size:14px; color:var(--ink-soft); text-transform:none; letter-spacing:0; line-height:1.5;">Exploring, in time, whether sonic interventions could reduce stress or trauma‑related symptoms in real‑world settings.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="fund">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Fund the First Study</div>
+      <h2>$200,000 funds the first study in USF's research journey</h2>
+      <p>This gift funds <em>Listening to the Brain</em> — the first rigorous scientific test of whether sound can be measured as a biological tool for emotional and mental health, and the foundation for every study that follows as USF continues developing the ASE Method through research and data.</p>
+    </div>
+
+    <div class="fund-panel">
+      <div class="fund-top">
+        <div class="fund-goal">
+          <div class="amount"><span class="needed">$0 raised</span> <small>&nbsp;of $200,000</small></div>
+          <div class="of">Live total pending donation platform integration</div>
+        </div>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:0%;"></div></div>
+      <div class="bar-labels"><span>$0</span><span>$200,000 goal</span></div>
+
+      <div class="fund-cta">
+        <a class="btn btn-primary" href="#contact">Donate Now</a>
+        <span class="needed">Donation processor not yet connected</span>
+      </div>
+
+      <div class="allocation">
+        <div class="cell"><div class="t">Allocation</div><div class="d">[CONTENT NEEDED] research staff & procedures</div></div>
+        <div class="cell"><div class="t">Allocation</div><div class="d">[CONTENT NEEDED] equipment & data analysis</div></div>
+        <div class="cell"><div class="t">Allocation</div><div class="d">[CONTENT NEEDED] animal care & facilities</div></div>
+      </div>
+
+      <div class="fund-note">Universal Sound Foundation is a non‑profit organization. <span class="needed">EIN / tax‑receipt language needed</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="tight">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Ways to Engage</div>
+      <h2>Stay connected, partner with us, or support the movement</h2>
+    </div>
+    <div class="engage-grid">
+      <div class="engage-cell">
+        <h3>Donate</h3>
+        <p>Give directly toward the $200,000 goal for the Lieber Institute study.</p>
+        <a class="btn btn-ghost" href="#fund">Donate to the study</a>
+      </div>
+      <div class="engage-cell">
+        <h3>Partner With Us</h3>
+        <p>Institutions and funders interested in joining this research. <span class="needed">Contact process needed</span></p>
+        <a class="btn btn-ghost" href="#contact">Get in touch</a>
+      </div>
+      <div class="engage-cell">
+        <h3>Stay Connected</h3>
+        <p>Follow the study as it develops.</p>
+        <div class="signup-row">
+          <input type="email" placeholder="you@email.com" disabled />
+          <a class="btn btn-ghost" href="#" aria-disabled="true">Sign up</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="closing" style="border-bottom:none;">
+  <div class="wrap">
+    <div class="eyebrow">Our Vision</div>
+    <h2 style="margin-top:16px;">We imagine a world where sound is recognized as medicine — where creativity and science meet, and resonance becomes a pathway to healing for all.</h2>
+    <div class="final-line">Where sound becomes healing, and healing becomes universal.</div>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#fund">Donate to the Study</a>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">Universal Sound Foundation</div>
+        <div class="footer-meta">A non‑profit organization advancing sound medicine through research, collaboration, and innovation. At the beginning of its journey.</div>
+        <div class="footer-meta" style="margin-top:10px;"><span class="needed">Mailing address & contact email needed</span></div>
+      </div>
+      <nav>
+        <a href="#why">Our Story</a>
+        <a href="#heard">What We've Heard</a>
+        <a href="#research">The Research</a>
+        <a href="#fund">Donate</a>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Universal Sound Foundation</span>
+      <span class="needed">EIN / registration number needed</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var canvas = document.getElementById('wavecanvas');
+  var ctx = canvas.getContext('2d');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  function resize(){
+    var rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+  }
+
+  function getColors(){
+    var cs = getComputedStyle(document.documentElement);
+    return {
+      accent: cs.getPropertyValue('--accent').trim(),
+      accentSoft: cs.getPropertyValue('--accent-soft').trim(),
+      gold: cs.getPropertyValue('--gold').trim(),
+      line: cs.getPropertyValue('--line').trim()
+    };
+  }
+
+  var t = 0;
+  function draw(){
+    var w = canvas.width, h = canvas.height;
+    var colors = getColors();
+    ctx.clearRect(0,0,w,h);
+
+    // baseline grid
+    ctx.strokeStyle = colors.line;
+    ctx.lineWidth = 1 * dpr;
+    ctx.beginPath();
+    ctx.moveTo(0, h/2);
+    ctx.lineTo(w, h/2);
+    ctx.stroke();
+
+    // three overlapping traces referencing the three study conditions
+    var traces = [
+      { amp: 0.30, freq: 5.2, speed: 1.0, color: colors.accent, width: 2.4 },
+      { amp: 0.16, freq: 9.6, speed: 0.6, color: colors.accentSoft, width: 1.4 },
+      { amp: 0.09, freq: 14.2, speed: 1.4, color: colors.gold, width: 1.2 }
+    ];
+
+    traces.forEach(function(tr){
+      ctx.beginPath();
+      ctx.lineWidth = tr.width * dpr;
+      ctx.strokeStyle = tr.color;
+      ctx.globalAlpha = 0.9;
+      for (var x = 0; x <= w; x += 4*dpr){
+        var progress = x / w;
+        var y = h/2 + Math.sin(progress * Math.PI * 2 * tr.freq + t * tr.speed) * (h * tr.amp) * Math.min(1, progress*6) * Math.min(1,(1-progress)*6+0.4);
+        if (x === 0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  resize();
+  draw();
+  window.addEventListener('resize', function(){ resize(); draw(); });
+
+  if (!reduce){
+    (function loop(){
+      t += 0.02;
+      draw();
+      requestAnimationFrame(loop);
+    })();
+  }
+})();
+</script>
+
+</body>
+</html>
+
+</body></html>
